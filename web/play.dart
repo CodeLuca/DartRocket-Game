@@ -1,16 +1,28 @@
 part of mygame;
+
+
 class Play extends State {
 
-  Sprite player, enemy;
-
-  Group<Sprite> bullets;
-
+  Sprite eOne, eTwo, eThree, eFour, eFive, eSix;
+  Sprite player, Shooter, melee;
+  Group<Sprite> bullets, eBullets;
+  Group<Sprite> enemies = new Group<Sprite>();
+  Timer bulletTimer, eBulletTimer;
+  bool timerIsOn = false;
 
   @override
   create() {
+    game.add.background(
+        'purple',
+        isMovable: true,
+        repeatMode: Background.REPEAT_XY)
+      ..vx = 100
+      ..vy = 250;
+
+
     player = game.add.sprite('playerShip1_blue')
         ..x = game.world.width ~/ 2
-        ..y = game.world.height ~/ 2
+        ..y = game.world.height - 100
         ..speed = 200
         ..acceleration = 50
         ..minSpeed = 0
@@ -18,9 +30,9 @@ class Play extends State {
         ..collideWorldBounds = true
         ..center();
 
-    enemy = game.add.sprite('ufoRed')
-        ..x = player.x + 100
-        ..y = player.y + 50
+    melee = game.add.sprite('flatDark23')
+        ..x = player.x + 500
+        ..y = player.y
         ..speed = 200
         ..acceleration = 50
         ..minSpeed = 0
@@ -28,12 +40,42 @@ class Play extends State {
         ..collideWorldBounds = true
         ..center();
 
+    createSprite(Sprite sprite, int xp){
+      sprite.x = xp;
+      sprite.y = 300;
+      sprite.speedY = 30;
+      sprite.alive = true;
+      return sprite;
+    }
+    eOne = game.add.sprite('ufoRed');
+    createSprite(eOne, 30);
+    Shooter = game.add.sprite('ufoRed');
+    createSprite(Shooter, 70);
+    
+    eBullets = new Group<Sprite>();
+    for (int z = 0; z < 5; z++) {
+      eBullets.add(game.add.sprite('laserBlue01', addToWorld: false)
+        ..speedY = 500
+        ..killOutOfBounds = true);
+    }
+
+    Sprite eBullet;
+    eBulletTimer = new Timer.periodic(new Duration(milliseconds: 750), (_) {
+      if (eBullets.any((item) => !item.alive)) {
+        eBullet = eBullets.firstWhere((item) => !item.alive)
+          ..x = Shooter.x + Shooter.width ~/ 2
+          ..y = Shooter.y
+          ..alive = true;
+        eBullet.move('down');
+        eBullet.addToWorld();
+      }
+    });
+
     bullets = new Group<Sprite>();
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 10; i++) {
       bullets.add(game.add.sprite('laserBlue01', addToWorld: false)
         //rotation
         ..speedY = 500
-        ..move('up')
         ..killOutOfBounds = true);
     }
 
@@ -50,33 +92,33 @@ class Play extends State {
 
   @override
   update() {
-    if(enemy.x < player.x && enemy.y < player.y){
-      enemy.rotation = 180 + 30;
-      enemy.x += 1;
-      enemy.y += 1;
+    if(melee.x < player.x && melee.y < player.y){
+      melee.rotation = 180 + 30;
+      melee.x += 1;
+      melee.y += 1;
     }
     //
-    if(enemy.x > player.x && enemy.y < player.y){
-      enemy.rotation = 180 + 25;
-      enemy.x -= 1;
-      enemy.y += 1;
+    if(melee.x > player.x && melee.y < player.y){
+      melee.rotation = 180 + 25;
+      melee.x -= 1;
+      melee.y += 1;
     }
     //
-    if(enemy.x < player.x && enemy.y > player.y){
-      enemy.rotation = 90 - 45;
-      enemy.x += 1;
-      enemy.y -= 1;
+    if(melee.x < player.x && melee.y > player.y){
+      melee.rotation = 90 - 45;
+      melee.x += 1;
+      melee.y -= 1;
     }
     //
-    if(enemy.x > player.x && enemy.y > player.y){
-      enemy.rotation = 180 + 45;
-      enemy.x -= 1;
-      enemy.y -= 1;
+    if(melee.x > player.x && melee.y > player.y){
+      melee.rotation = 180 + 45;
+      melee.x -= 1;
+      melee.y -= 1;
     }
     
     player.stop();
     //player.stopSpeedChange();
-    
+
     if (game.keyboard.isDown(KeyCode.W)) {
       player.move('forward');
     }
@@ -90,23 +132,29 @@ class Play extends State {
       player.move('right');
     }
 
-    if (game.keyboard.isDown(KeyCode.Q)) {
-      player.rotateAngles(-5);
-      enemy.rotateAngles(-5);
-    }
-    if (game.keyboard.isDown(KeyCode.E)) {
-      player.rotateAngles(5);
-      enemy.rotateAngles(5);
-    }
+//    if (game.keyboard.isDown(KeyCode.Q)) {
+//      player.rotateAngles(-5);
+//      enemy.rotateAngles(-5);
+//    }
+//    if (game.keyboard.isDown(KeyCode.E)) {
+//      player.rotateAngles(5);
+//      enemy.rotateAngles(5);
+//    }
 
-    if (game.keyboard.isDown(KeyCode.M)){
-      Sprite bullet;
-      if (bullets.any((item) => !item.alive)) {
+    Sprite bullet;
+
+    if (game.keyboard.isDown(KeyCode.SPACE)) {
+      if (timerIsOn) {
+        return;
+      } else {
+        timerIsOn = true;
+        bulletTimer = new Timer(new Duration(milliseconds: 300), (finish));
+        player.center();
         bullet = bullets.firstWhere((item) => !item.alive)
-          ..x = player.x + player.width ~/ 2
+          ..x = player.x
           ..y = player.y
           ..alive = true;
-
+        bullet.move('up');
         bullet.addToWorld();
       }
     }
@@ -118,4 +166,5 @@ class Play extends State {
       player.slowDown();
     }*/
   }
+  finish(){timerIsOn = false;}
 }

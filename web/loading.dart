@@ -10,7 +10,6 @@ class Loading extends State {
 
     game.resourceManager.addTextureAtlas('spaceinvader', 'images/spaceinvader',
         TextureAtlasFormat.JSON);
-
     game.resourceManager.addBitmapData('enemyShip', 'playerShip1_red.png');
 
   }
