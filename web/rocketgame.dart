@@ -2,7 +2,9 @@ library mygame;
 
 import 'package:dartrocket/dartrocket.dart';
 import 'dart:async';
+import 'dart:math';
 
+part 'end.dart';
 part 'play.dart';
 part 'loading.dart';
 
@@ -16,7 +18,8 @@ void main() {
 
   game.stateManager.addStateMap({
       "loading": new Loading(),
-      "play": new Play()
+      "play": new Play(),
+      "end": new end()
   });
 
   //start the play state

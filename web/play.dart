@@ -1,12 +1,13 @@
 part of mygame;
 
-
 class Play extends State {
-
+  Random r = new Random();
   Sprite eOne, eTwo, eThree, eFour, eFive, eSix;
+  Sprite eBullet;
   Sprite player, Shooter, melee;
   Group<Sprite> bullets, eBullets;
   Group<Sprite> enemies = new Group<Sprite>();
+  List<Sprite> spriteList = new List<Sprite>();
   Timer bulletTimer, eBulletTimer;
   bool timerIsOn = false;
 
@@ -41,30 +42,47 @@ class Play extends State {
         ..center();
 
     createSprite(Sprite sprite, int xp){
-      sprite.x = xp;
-      sprite.y = 300;
+      sprite.x = 200 + xp;
+      sprite.y = 100;
       sprite.speedY = 30;
       sprite.alive = true;
+      enemies.add(sprite);
       return sprite;
     }
-    eOne = game.add.sprite('ufoRed');
-    createSprite(eOne, 30);
     Shooter = game.add.sprite('ufoRed');
-    createSprite(Shooter, 70);
-    
+    createSprite(Shooter, 1 * 100 + 10);
+    eOne = game.add.sprite('ufoRed');
+    createSprite(eOne, 2 * 100 + 10);
+    spriteList.add(eOne);
+    eTwo = game.add.sprite('ufoRed');
+    createSprite(eTwo, 3 * 100 + 10);
+    spriteList.add(eTwo);
+    eThree = game.add.sprite('ufoRed');
+    createSprite(eThree, 4 * 100 + 10);
+    spriteList.add(eThree);
+    eFour = game.add.sprite('ufoRed');
+    createSprite(eFour, 5 * 100 + 10);
+    spriteList.add(eFour);
+    eFive = game.add.sprite('ufoRed');
+    createSprite(eFive, 6 * 100 + 10);
+    spriteList.add(eFive);
+    eSix = game.add.sprite('ufoRed');
+    createSprite(eSix, 7 * 100 + 10);
+    spriteList.add(eSix);
+
     eBullets = new Group<Sprite>();
-    for (int z = 0; z < 5; z++) {
+    for (int z = 0; z < 15; z++) {
       eBullets.add(game.add.sprite('laserBlue01', addToWorld: false)
-        ..speedY = 500
+        ..speedY = 100
         ..killOutOfBounds = true);
     }
 
-    Sprite eBullet;
-    eBulletTimer = new Timer.periodic(new Duration(milliseconds: 750), (_) {
+    eBulletTimer = new Timer.periodic(new Duration(milliseconds: 300), (_) {
+      int eShooter = r.nextInt(spriteList.length);
       if (eBullets.any((item) => !item.alive)) {
         eBullet = eBullets.firstWhere((item) => !item.alive)
-          ..x = Shooter.x + Shooter.width ~/ 2
-          ..y = Shooter.y
+          ..x = spriteList[eShooter].x + 45
+          ..y = spriteList[eShooter].y
           ..alive = true;
         eBullet.move('down');
         eBullet.addToWorld();
@@ -87,35 +105,11 @@ class Play extends State {
         KeyCode.K,
         player.slowDown,
         player.stopSpeedChange);
-
 }
-
   @override
   update() {
-    if(melee.x < player.x && melee.y < player.y){
-      melee.rotation = 180 + 30;
-      melee.x += 1;
-      melee.y += 1;
-    }
-    //
-    if(melee.x > player.x && melee.y < player.y){
-      melee.rotation = 180 + 25;
-      melee.x -= 1;
-      melee.y += 1;
-    }
-    //
-    if(melee.x < player.x && melee.y > player.y){
-      melee.rotation = 90 - 45;
-      melee.x += 1;
-      melee.y -= 1;
-    }
-    //
-    if(melee.x > player.x && melee.y > player.y){
-      melee.rotation = 180 + 45;
-      melee.x -= 1;
-      melee.y -= 1;
-    }
-    
+
+      meleeEvent();
     player.stop();
     //player.stopSpeedChange();
 
@@ -159,6 +153,25 @@ class Play extends State {
       }
     }
 
+    if(spriteList.length <= 1) {
+      killState("end");
+    }
+    game.physics.collison(enemies, bullets, (Sprite anenemy, Sprite abullet) {
+      spriteList.remove(anenemy);
+      anenemy.removeFromWorld();
+      abullet.removeFromWorld();
+    });
+
+    game.physics.collison(player, eBullets, (Sprite theplayer, Sprite thebullet) {
+      Sprite b;
+      spriteList.forEach((b) => b.removeFromWorld());
+
+      killState("end");
+      theplayer.removeFromWorld();
+      thebullet.removeFromWorld();
+    });
+
+
     /*if (game.keyboard.isDown(KeyCode.J)) {
       player.speedUP();
     }
@@ -167,4 +180,31 @@ class Play extends State {
     }*/
   }
   finish(){timerIsOn = false;}
+
+  meleeEvent(){
+    if(melee.x < player.x && melee.y < player.y){
+      melee.rotation = 180 + 30;
+      melee.x += 1;
+      melee.y += 1;
+    }
+    //
+    if(melee.x > player.x && melee.y < player.y){
+      melee.rotation = 180 + 25;
+      melee.x -= 1;
+      melee.y += 1;
+    }
+    //
+    if(melee.x < player.x && melee.y > player.y){
+      melee.rotation = 90 - 45;
+      melee.x += 1;
+      melee.y -= 1;
+    }
+    //
+    if(melee.x > player.x && melee.y > player.y){
+      melee.rotation = 180 + 45;
+      melee.x -= 1;
+      melee.y -= 1;
+    }
+  }
+
 }
