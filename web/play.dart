@@ -8,6 +8,7 @@ class Play extends State {
   Group<Sprite> bullets, eBullets;
   Group<Sprite> enemies = new Group<Sprite>();
   List<Sprite> spriteList = new List<Sprite>();
+  List<Sprite> eBulletsList = new List<Sprite>();
   Timer bulletTimer, eBulletTimer;
   bool timerIsOn = false;
 
@@ -72,9 +73,11 @@ class Play extends State {
 
     eBullets = new Group<Sprite>();
     for (int z = 0; z < 15; z++) {
-      eBullets.add(game.add.sprite('laserBlue01', addToWorld: false)
+      Sprite spr = game.add.sprite('laserBlue01', addToWorld: false)
         ..speedY = 100
-        ..killOutOfBounds = true);
+        ..killOutOfBounds = true;
+      eBullets.add(spr);
+      eBulletsList.add(spr);
     }
 
     eBulletTimer = new Timer.periodic(new Duration(milliseconds: 300), (_) {
@@ -153,7 +156,7 @@ class Play extends State {
       }
     }
 
-    if(spriteList.length <= 1) {
+    if(spriteList.length == 0) {
       killState("end");
     }
     game.physics.collison(enemies, bullets, (Sprite anenemy, Sprite abullet) {
@@ -163,12 +166,12 @@ class Play extends State {
     });
 
     game.physics.collison(player, eBullets, (Sprite theplayer, Sprite thebullet) {
-      Sprite b;
-      spriteList.forEach((b) => b.removeFromWorld());
-
+//      Sprite b;
+//      spriteList.forEach((b) => b.removeFromWorld());
+//      eBullets.forEach((b) => b.removeFromWorld());
+//      theplayer.removeFromWorld();
+//      thebullet.removeFromWorld();
       killState("end");
-      theplayer.removeFromWorld();
-      thebullet.removeFromWorld();
     });
 
 
