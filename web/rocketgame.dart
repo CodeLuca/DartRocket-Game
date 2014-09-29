@@ -7,6 +7,7 @@ import 'dart:math';
 part 'end.dart';
 part 'play.dart';
 part 'loading.dart';
+part 'start.dart';
 
 void main() {
   
@@ -19,7 +20,8 @@ void main() {
   game.stateManager.addStateMap({
       "loading": new Loading(),
       "play": new Play(),
-      "end": new end()
+      "end": new end(),
+      "start": new start()
   });
 
   //start the play state

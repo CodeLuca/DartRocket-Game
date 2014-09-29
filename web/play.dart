@@ -175,6 +175,15 @@ class Play extends State {
     });
 
 
+    game.physics.collison(player, melee, (Sprite theplayer, Sprite meleee) {
+//      Sprite b;
+//      spriteList.forEach((b) => b.removeFromWorld());
+//      eBullets.forEach((b) => b.removeFromWorld());
+//      theplayer.removeFromWorld();
+//      thebullet.removeFromWorld();
+      killState("end");
+    });
+
     /*if (game.keyboard.isDown(KeyCode.J)) {
       player.speedUP();
     }

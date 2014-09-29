@@ -14,6 +14,6 @@ class Loading extends State {
 
   }
   create() {
-    killState("play");
+    killState("start");
   }
 }
