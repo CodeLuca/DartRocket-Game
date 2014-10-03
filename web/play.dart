@@ -1,10 +1,11 @@
 part of mygame;
 
 class Play extends State {
+  static int potato = 1;
   Random r = new Random();
-  Sprite eOne, eTwo, eThree, eFour, eFive, eSix;
+  Sprite eOne, eTwo, eThree, eFour, eFive, eSix, eSeven, eEight, eNine, eTen, eEleven, eTwelve, eThirteen;
   Sprite eBullet;
-  Sprite player, Shooter, melee;
+  Sprite player, Shooter, melee, melee2, melee3;
   Group<Sprite> bullets, eBullets;
   Group<Sprite> enemies = new Group<Sprite>();
   List<Sprite> spriteList = new List<Sprite>();
@@ -33,6 +34,7 @@ class Play extends State {
         ..center();
 
     melee = game.add.sprite('flatDark23')
+        ..alive = true
         ..x = player.x + 500
         ..y = player.y
         ..speed = 200
@@ -42,34 +44,60 @@ class Play extends State {
         ..collideWorldBounds = true
         ..center();
 
-    createSprite(Sprite sprite, int xp){
+    createSprite(Sprite sprite, int xp, bool top){
       sprite.x = 200 + xp;
-      sprite.y = 100;
+      if(top == true){
+        sprite.y = 10;
+      } else {
+        sprite.y = 110;
+      }
       sprite.speedY = 30;
       sprite.alive = true;
       enemies.add(sprite);
       return sprite;
     }
+
     Shooter = game.add.sprite('ufoRed');
-    createSprite(Shooter, 1 * 100 + 10);
+    createSprite(Shooter, 1 * 100 + 10, false);
     eOne = game.add.sprite('ufoRed');
-    createSprite(eOne, 2 * 100 + 10);
+    createSprite(eOne, 2 * 100 + 10, false);
     spriteList.add(eOne);
     eTwo = game.add.sprite('ufoRed');
-    createSprite(eTwo, 3 * 100 + 10);
+    createSprite(eTwo, 3 * 100 + 10, false);
     spriteList.add(eTwo);
     eThree = game.add.sprite('ufoRed');
-    createSprite(eThree, 4 * 100 + 10);
+    createSprite(eThree, 4 * 100 + 10, false);
     spriteList.add(eThree);
     eFour = game.add.sprite('ufoRed');
-    createSprite(eFour, 5 * 100 + 10);
+    createSprite(eFour, 5 * 100 + 10, false);
     spriteList.add(eFour);
     eFive = game.add.sprite('ufoRed');
-    createSprite(eFive, 6 * 100 + 10);
+    createSprite(eFive, 6 * 100 + 10, false);
     spriteList.add(eFive);
     eSix = game.add.sprite('ufoRed');
-    createSprite(eSix, 7 * 100 + 10);
+    createSprite(eSix, 7 * 100 + 10, false);
     spriteList.add(eSix);
+    eSeven = game.add.sprite('ufoRed');
+    createSprite(eSeven, 1 * 100 + 10, true);
+    spriteList.add(eSeven);
+    eEight = game.add.sprite('ufoRed');
+    createSprite(eEight, 2 * 100 + 10, true);
+    spriteList.add(eEight);
+    eNine = game.add.sprite('ufoRed');
+    createSprite(eNine, 3 * 100 + 10, true);
+    spriteList.add(eNine);
+    eTen = game.add.sprite('ufoRed');
+    createSprite(eTen, 4 * 100 + 10, true);
+    spriteList.add(eTen);
+    eEleven = game.add.sprite('ufoRed');
+    createSprite(eEleven, 5 * 100 + 10, true);
+    spriteList.add(eEleven);
+    eTwelve = game.add.sprite('ufoRed');
+    createSprite(eTwelve, 6 * 100 + 10, true);
+    spriteList.add(eTwelve);
+    eThirteen = game.add.sprite('ufoRed');
+    createSprite(eThirteen, 7 * 100 + 10, true);
+    spriteList.add(eThirteen);
 
     eBullets = new Group<Sprite>();
     for (int z = 0; z < 15; z++) {
@@ -149,14 +177,16 @@ class Play extends State {
         player.center();
         bullet = bullets.firstWhere((item) => !item.alive)
           ..x = player.x
-          ..y = player.y
+          ..y = player.y - 50
           ..alive = true;
         bullet.move('up');
         bullet.addToWorld();
       }
     }
 
-    if(spriteList.length == 0) {
+    if(spriteList.length == 0 && melee.alive == false) {
+      eBulletTimer.cancel();
+      death = "You win!";
       killState("end");
     }
     game.physics.collison(enemies, bullets, (Sprite anenemy, Sprite abullet) {
@@ -166,30 +196,30 @@ class Play extends State {
     });
 
     game.physics.collison(player, eBullets, (Sprite theplayer, Sprite thebullet) {
-//      Sprite b;
-//      spriteList.forEach((b) => b.removeFromWorld());
-//      eBullets.forEach((b) => b.removeFromWorld());
-//      theplayer.removeFromWorld();
-//      thebullet.removeFromWorld();
+      eBulletTimer.cancel();
+      death = "You died by getting hit by an enemy bullet!";
       killState("end");
     });
 
+    game.physics.collison(bullets, melee, (Sprite thebullet, Sprite melee) {
+      spriteList.remove(melee);
+      thebullet.removeFromWorld();
+      melee.alive = false;
+      melee.removeFromWorld();
+    });
 
     game.physics.collison(player, melee, (Sprite theplayer, Sprite meleee) {
-//      Sprite b;
-//      spriteList.forEach((b) => b.removeFromWorld());
-//      eBullets.forEach((b) => b.removeFromWorld());
-//      theplayer.removeFromWorld();
-//      thebullet.removeFromWorld();
+        eBulletTimer.cancel();
+        death = "You died by getting hit by the Melee alien!";
+        killState("end");
+    });
+
+    game.physics.collison(player, enemies, (Sprite theplayer, Sprite anenemy) {
+      eBulletTimer.cancel();
+      death = "You died by getting hit by an enemy alien!";
       killState("end");
     });
 
-    /*if (game.keyboard.isDown(KeyCode.J)) {
-      player.speedUP();
-    }
-    if (game.keyboard.isDown(KeyCode.K)) {
-      player.slowDown();
-    }*/
   }
   finish(){timerIsOn = false;}
 
@@ -200,7 +230,7 @@ class Play extends State {
       melee.y += 1;
     }
     //
-    if(melee.x > player.x && melee.y < player.y){
+    if(melee.x > player.x && melee.y < player.y || melee.x > player.x && melee.y == player.y){
       melee.rotation = 180 + 25;
       melee.x -= 1;
       melee.y += 1;

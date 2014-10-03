@@ -9,10 +9,11 @@ part 'play.dart';
 part 'loading.dart';
 part 'start.dart';
 
+String death;
+
 void main() {
-  
   //starting the game engine
-  Game game = new Game(width:1280, height:720);
+    Game game = new Game(width:1280, height:720);
 
   game.add.defaultResourceMode = GameObjectFactory.TEXTUREATLAS;
   game.add.defaultTextureAtlasName = 'spaceinvader';
